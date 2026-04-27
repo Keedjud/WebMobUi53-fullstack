@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 return [
+    'polls' => [
+        'index' => [
+            'title' => 'Sondages',
+        ],
+    ],
     'home' => [
         'title' => 'Accueil',
         'description' => "Page d'accueil du réseau social.",
