@@ -17,5 +17,11 @@ export function usePollStore() {
     }
   }
 
-  return { polls, setPolls, deletePoll };
+  async function createPoll(payload) {
+    const poll = await fetchApi({ url: 'polls', method: 'POST', data: payload });
+    polls.value = [poll, ...polls.value];
+    return poll;
+  }
+
+  return { polls, setPolls, deletePoll, createPoll };
 }
