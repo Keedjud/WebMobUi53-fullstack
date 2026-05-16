@@ -86,7 +86,10 @@ POST /api/v1/polls (auth)
 - Response: created poll with options + share_url
 
 PATCH /api/v1/polls/{id} (auth, owner)
-- Same body as POST but options are edited via CRUD fine by id
+- Same body as POST but options are edited via CRUD fine by id:
+  - options_create: [{ label }]
+  - options_update: [{ id, label }]
+  - options_delete: [id]
 - Response: updated poll with options + share_url
 
 DELETE /api/v1/polls/{id} (auth, owner)

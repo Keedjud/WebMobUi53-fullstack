@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Poll extends Model
 {
+    protected $casts = [
+        'is_draft' => 'boolean',
+        'allow_multiple_choices' => 'boolean',
+        'allow_vote_change' => 'boolean',
+        'results_public' => 'boolean',
+        'started_at' => 'datetime',
+        'ends_at' => 'datetime',
+    ];
+
     /**
      * Get the user that owns the poll.
      */
