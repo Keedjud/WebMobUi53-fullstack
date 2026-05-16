@@ -56,6 +56,13 @@
     if (poll?.is_active) return 'En cours';
     return 'A venir';
   }
+
+  function formatDateTime(value) {
+    if (!value) return '-';
+    const match = String(value).match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+    if (!match) return '-';
+    return `${match[3]}.${match[2]}.${match[1]} ${match[4]}:${match[5]}`;
+  }
 </script>
 
 <template>
@@ -100,8 +107,8 @@
           <td class="border px-3 py-2">{{ poll.title || '-' }}</td>
           <td class="border px-3 py-2">{{ poll.question }}</td>
           <td class="border px-3 py-2">{{ getStatusLabel(poll) }}</td>
-          <td class="border px-3 py-2">{{ poll.started_at || '-' }}</td>
-          <td class="border px-3 py-2">{{ poll.ends_at || '-' }}</td>
+          <td class="border px-3 py-2">{{ formatDateTime(poll.started_at) }}</td>
+          <td class="border px-3 py-2">{{ formatDateTime(poll.ends_at) }}</td>
         </tr>
       </tbody>
     </table>
