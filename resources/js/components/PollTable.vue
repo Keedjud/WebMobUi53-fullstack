@@ -1,9 +1,13 @@
 <script setup>
+  import { ref } from 'vue';
   import { usePollStore } from '@/stores/usePollStore';
 
   const emit = defineEmits(['navigate']);
 
   const { polls, deletePoll } = usePollStore();
+  const toastMessage = ref('');
+  const toastType = ref('success');
+  let toastTimer = null;
 
   async function delPoll(id) {
     console.log('delete Poll ID:', id);
@@ -16,6 +20,34 @@
 
   function createPoll() {
     emit('navigate', { view: 'create' });
+  }
+
+  function showToast(message, type = 'success') {
+    toastMessage.value = message;
+    toastType.value = type;
+
+    if (toastTimer) {
+      clearTimeout(toastTimer);
+    }
+
+    toastTimer = setTimeout(() => {
+      toastMessage.value = '';
+      toastTimer = null;
+    }, 2000);
+  }
+
+  async function copyShareLink(poll) {
+    if (!poll?.share_url) {
+      showToast('Lien indisponible.', 'error');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(poll.share_url);
+      showToast(`Lien copie pour le sondage #${poll.id}.`, 'success');
+    } catch (error) {
+      showToast('Impossible de copier le lien.', 'error');
+    }
   }
 </script>
 
@@ -48,6 +80,7 @@
           <td class="border px-3 py-2">
               <button type="button" class="btn-edit" @click="editPoll(poll.id)">Modifier</button>
               <button type="button" class="btn-delete" @click="delPoll(poll.id)">Supp.</button>
+              <button type="button" class="btn-copy" @click="copyShareLink(poll)">Copier lien</button>
           </td>
           <td class="border px-3 py-2">{{ poll.id }}</td>
           <td class="border px-3 py-2">{{ poll.title || '-' }}</td>
@@ -58,6 +91,10 @@
         </tr>
       </tbody>
     </table>
+
+    <div v-if="toastMessage" class="toast" :class="toastType">
+      {{ toastMessage }}
+    </div>
   </div>
 </template>
 
@@ -80,5 +117,33 @@
 
   .btn-delete {
     background-color: #e3342f;
+  }
+
+  .btn-copy {
+    background-color: #16a34a;
+    margin-left: 0.25rem;
+  }
+
+  .toast {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+    color: #f8fafc;
+    background: rgba(15, 23, 42, 0.75);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+    opacity: 0.9;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  .toast.success {
+    background: rgba(22, 163, 74, 0.75);
+  }
+
+  .toast.error {
+    background: rgba(239, 68, 68, 0.75);
   }
 </style>

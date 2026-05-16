@@ -2,6 +2,7 @@
   import { onBeforeUnmount, onMounted, ref } from 'vue';
   import PollTable from './components/PollTable.vue';
   import PollCreateForm from './components/PollCreateForm.vue';
+  import PollEditForm from './components/PollEditForm.vue';
   import { usePollStore } from '@/stores/usePollStore';
 
   const props = defineProps({
@@ -74,21 +75,10 @@
     @cancel="navigateTo('table')"
   />
 
-  <section
+  <PollEditForm
     v-else
-    class="mt-6 bg-white dark:bg-slate-800 rounded-lg shadow-md p-6"
-  >
-    <h2 class="text-2xl font-bold dark:text-white mb-2">Edition du sondage</h2>
-    <p class="dark:text-gray-300">
-      Cette section sera implementee ensuite.
-      <span v-if="editingPollId"> Sondage cible: #{{ editingPollId }}.</span>
-    </p>
-    <button
-      type="button"
-      class="mt-4 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
-      @click="navigateTo('table')"
-    >
-      Retour au tableau
-    </button>
-  </section>
+    :poll-id="editingPollId"
+    @updated="navigateTo('table')"
+    @cancel="navigateTo('table')"
+  />
 </template>
