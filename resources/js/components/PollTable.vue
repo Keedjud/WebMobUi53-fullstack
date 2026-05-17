@@ -4,14 +4,18 @@
 
   const emit = defineEmits(['navigate']);
 
-  const { polls, deletePoll } = usePollStore();
+  const { polls, deletePoll, publishPoll } = usePollStore();
   const toastMessage = ref('');
   const toastType = ref('success');
   let toastTimer = null;
 
-  async function delPoll(id) {
-    console.log('delete Poll ID:', id);
-    await deletePoll(id);
+  async function delPoll(poll) {
+    const label = poll?.title || poll?.question || `#${poll?.id}`;
+    if (!confirm(`Supprimer le sondage "${label}" ?`)) {
+      return;
+    }
+
+    await deletePoll(poll.id);
   }
 
   function editPoll(id) {
@@ -50,11 +54,32 @@
     }
   }
 
+  async function publishDraft(poll) {
+    if (!poll?.id) return;
+    try {
+      await publishPoll(poll.id);
+      showToast('Sondage publie.', 'success');
+    } catch (error) {
+      showToast('Impossible de publier le sondage.', 'error');
+    }
+  }
+
   function getStatusLabel(poll) {
     if (poll?.is_draft) return 'Brouillon';
-    if (poll?.is_ended) return 'Termine';
-    if (poll?.is_active) return 'En cours';
-    return 'A venir';
+    const now = new Date();
+    const startsAt = parseDateTime(poll?.started_at);
+    const endsAt = parseDateTime(poll?.ends_at);
+
+    if (endsAt && endsAt < now) return 'Termine';
+    if (startsAt && startsAt > now) return 'A venir';
+    return 'En cours';
+  }
+
+  function parseDateTime(value) {
+    if (!value) return null;
+    const match = String(value).match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+    if (!match) return null;
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), Number(match[4]), Number(match[5]));
   }
 
   function formatDateTime(value) {
@@ -100,7 +125,24 @@
               >
                 Modifier
               </button>
-              <button type="button" class="btn-delete" @click="delPoll(poll.id)">Supp.</button>
+              <button
+                v-if="poll.is_draft"
+                type="button"
+                class="btn-publish"
+                @click="publishDraft(poll)"
+              >
+                Publier
+              </button>
+              <a
+                v-if="poll.share_url"
+                :href="poll.share_url"
+                class="btn-results"
+                target="_blank"
+                rel="noopener"
+              >
+                Resultats
+              </a>
+              <button type="button" class="btn-delete" @click="delPoll(poll)">Supp.</button>
               <button type="button" class="btn-copy" @click="copyShareLink(poll)">Copier lien</button>
           </td>
           <td class="border px-3 py-2">{{ poll.id }}</td>
@@ -138,6 +180,21 @@
 
   .btn-delete {
     background-color: #e3342f;
+  }
+
+  .btn-publish {
+    background-color: #0f766e;
+    margin-left: 0.25rem;
+  }
+
+  .btn-results {
+    background-color: #475569;
+    margin-left: 0.25rem;
+    text-decoration: none;
+    display: inline-block;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
   }
 
   .btn-copy {

@@ -45,12 +45,19 @@ export function usePollStore() {
     return poll;
   }
 
+  async function publishPoll(id) {
+    const poll = await fetchApi({ url: `polls/${id}/publish`, method: 'PATCH' });
+    polls.value = polls.value.map(item => (item.id === poll.id ? { ...item, ...poll } : item));
+    return poll;
+  }
+
   return {
     polls,
     setPolls,
     deletePoll,
     createPoll,
     updatePoll,
+    publishPoll,
     fetchPollByToken,
     extractTokenFromShareUrl,
   };

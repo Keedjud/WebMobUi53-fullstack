@@ -250,6 +250,30 @@ class ApiPollController extends Controller
     }
 
     /**
+     * Publish a draft poll.
+     */
+    public function publish(Request $request, int $id)
+    {
+        $poll = Poll::where('id', $id)->where('user_id', $request->user()->id)->first();
+
+        if (!$poll) {
+            return response()->json(['message' => 'Poll not found.'], 404);
+        }
+
+        if (!$poll->is_draft) {
+            return response()->json(['message' => 'Poll already published.'], 409);
+        }
+
+        $poll->is_draft = false;
+        $poll->save();
+
+        $this->appendOwnerFields($poll);
+        $this->appendStatusFlags($poll, $request->user()->id);
+
+        return response()->json($poll, 200);
+    }
+
+    /**
      * Remove the specified poll.
      */
     public function remove(Request $request, int $id)
