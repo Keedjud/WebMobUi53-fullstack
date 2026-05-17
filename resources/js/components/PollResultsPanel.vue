@@ -2,7 +2,6 @@
   import { computed } from 'vue';
 
   const props = defineProps({
-    poll: { type: Object, required: true },
     results: { type: Object, default: null },
     loading: { type: Boolean, default: false },
     error: { type: String, default: '' },

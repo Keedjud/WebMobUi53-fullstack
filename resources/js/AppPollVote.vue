@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useFetchApi } from '@/composables/useFetchApi';
   import { usePolling } from '@/composables/usePolling';
   import PollVoteForm from './components/PollVoteForm.vue';
@@ -28,8 +28,6 @@
   const voteError = ref('');
   const voteNotice = ref('');
   const voteLocked = ref(false);
-  const pendingVoteIds = ref(null);
-  let voteTimer = null;
 
   const results = ref(null);
   const loadingResults = ref(false);
@@ -173,24 +171,6 @@
     }
   }
 
-  function queueVote(optionIds) {
-    if (!poll.value) return;
-
-    if (poll.value.allow_multiple_choices && !poll.value.allow_vote_change) {
-      pendingVoteIds.value = optionIds;
-
-      if (voteTimer) clearTimeout(voteTimer);
-
-      voteTimer = setTimeout(() => {
-        if (pendingVoteIds.value) submitVote(pendingVoteIds.value);
-        pendingVoteIds.value = null;
-        voteTimer = null;
-      }, 400);
-      return;
-    }
-
-    submitVote(optionIds);
-  }
 
   function handleSaveVote() {
     submitVote(selectedOptionIds.value);
@@ -206,10 +186,6 @@
     } else {
       loadPublicPolls();
     }
-  });
-
-  onBeforeUnmount(() => {
-    if (voteTimer) clearTimeout(voteTimer);
   });
 
   usePolling(() => {
@@ -256,12 +232,11 @@
             :error="voteError"
             :notice="voteNotice"
             :login-url="loginUrl"
-            @vote="queueVote"
+            @vote="submitVote"
             @submit="handleSaveVote"
           />
 
           <PollResultsPanel
-            :poll="poll"
             :results="results"
             :loading="loadingResults"
             :error="resultsError"

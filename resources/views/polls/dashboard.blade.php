@@ -10,9 +10,7 @@
     <div
         id="app"
         data-props='@json([
-            "polls" => $polls,
-            "loginUrl" => route("login"),
-            "username" => "test name"
+            "polls" => $polls
         ])'
     ></div>
 </x-default-layout>

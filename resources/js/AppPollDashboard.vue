@@ -7,8 +7,6 @@
 
   const props = defineProps({
     polls: { type: Array, default: () => [] },
-    loginUrl: { type: String, default: null },
-    username: { type: String, default: null },
   });
 
   const { setPolls } = usePollStore();
