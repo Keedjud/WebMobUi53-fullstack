@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'polls' => [
         'index' => [
-            'title' => 'Sondages',
+            'title' => 'Mes Sondages',
         ],
         'public' => [
             'title' => 'Sondages en cours',
