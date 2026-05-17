@@ -33,6 +33,10 @@
                         class="block bg-teal-700 dark:bg-purple-900 px-3 py-1 rounded-md hover:bg-teal-800 dark:hover:bg-purple-800">
                         {{ __('ui.posts.index.title') }}
                     </a>
+                    <a href="{{ route('polls.public') }}"
+                        class="block bg-teal-700 dark:bg-purple-900 px-3 py-1 rounded-md hover:bg-teal-800 dark:hover:bg-purple-800">
+                        {{ __('ui.polls.public.title') }}
+                    </a>
                     <a href="{{ route('polls.dashboard') }}#table"
                         class="block bg-teal-700 dark:bg-purple-900 px-3 py-1 rounded-md hover:bg-teal-800 dark:hover:bg-purple-800">
                         {{ __('ui.polls.index.title') }}

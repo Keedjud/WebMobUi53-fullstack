@@ -7,6 +7,9 @@ return [
         'index' => [
             'title' => 'Sondages',
         ],
+        'public' => [
+            'title' => 'Sondages en cours',
+        ],
     ],
     'home' => [
         'title' => 'Accueil',

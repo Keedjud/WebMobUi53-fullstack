@@ -1,0 +1,17 @@
+<x-default-layout>
+    <x-slot:title>
+        Sondage
+    </x-slot>
+
+    <x-slot:scripts>
+        @vite(['resources/js/poll-vote.js'])
+    </x-slot>
+
+    <div
+        id="app"
+        data-props='@json([
+            "token" => $token,
+            "loginUrl" => $loginUrl,
+        ])'
+    ></div>
+</x-default-layout>

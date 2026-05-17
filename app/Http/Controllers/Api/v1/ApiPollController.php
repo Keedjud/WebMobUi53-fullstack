@@ -28,6 +28,32 @@ class ApiPollController extends Controller
     }
 
     /**
+     * Display a listing of public active polls.
+     */
+    public function publicIndex()
+    {
+        $now = now();
+
+        $polls = Poll::with('user')
+            ->where('is_draft', false)
+            ->where(function ($query) use ($now) {
+                $query->whereNull('started_at')->orWhere('started_at', '<=', $now);
+            })
+            ->where(function ($query) use ($now) {
+                $query->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            })
+            ->orderBy('ends_at', 'asc')
+            ->get();
+
+        foreach ($polls as $poll) {
+            $this->appendPublicFields($poll);
+            $this->appendStatusFlags($poll, null);
+        }
+
+        return $polls;
+    }
+
+    /**
      * Store a newly created poll in storage.
      */
     public function store(Request $request)
@@ -82,14 +108,24 @@ class ApiPollController extends Controller
      */
     public function show(Request $request, string $token)
     {
-        $poll = Poll::with('options')->where('secret_token', $token)->first();
+        $poll = Poll::with(['options', 'user'])->where('secret_token', $token)->first();
 
         if (!$poll) {
             return response()->json(['message' => 'Poll not found.'], 404);
         }
 
-        $this->appendStatusFlags($poll, optional($request->user())->id);
-        $poll->makeHidden(['secret_token']);
+        $user = $request->user();
+
+        $this->appendPublicFields($poll);
+        $this->appendStatusFlags($poll, $user ? $user->id : null);
+
+        if ($user) {
+            $optionIds = PollVote::where('poll_id', $poll->id)
+                ->where('user_id', $user->id)
+                ->pluck('poll_option_id')
+                ->all();
+            $poll->setAttribute('user_option_ids', $optionIds);
+        }
 
         return $poll;
     }
@@ -337,6 +373,20 @@ class ApiPollController extends Controller
     {
         $poll->setAttribute('share_url', $this->shareUrl($poll));
         $poll->makeHidden(['secret_token']);
+    }
+
+    private function appendPublicFields(Poll $poll): void
+    {
+        $poll->setAttribute('share_url', $this->shareUrl($poll));
+        $poll->makeHidden(['secret_token']);
+
+        if ($poll->relationLoaded('user') && $poll->user) {
+            $authorName = trim(sprintf('%s %s', $poll->user->first_name, $poll->user->last_name));
+            $poll->setAttribute('author_name', $authorName !== '' ? $authorName : $poll->user->username);
+            $poll->setAttribute('author_username', $poll->user->username);
+        }
+
+        $poll->makeHidden(['user']);
     }
 
     private function appendStatusFlags(Poll $poll, ?int $userId): void

@@ -31,6 +31,19 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/login', 'login');
 });
 
+Route::get('/polls', function () {
+    return view('polls.index', [
+        'loginUrl' => route('login'),
+    ]);
+})->name('polls.public');
+
+Route::get('/polls/{token}', function (string $token) {
+    return view('polls.show', [
+        'token' => $token,
+        'loginUrl' => route('login'),
+    ]);
+})->where('token', '[A-Za-z0-9]{32}');
+
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', PollDashboardController::class)->name('polls.dashboard');
     Route::redirect('/polls/dashboard', '/dashboard#table');

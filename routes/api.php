@@ -16,8 +16,11 @@ Route::apiResource('v1/posts', ApiPostController::class)
     ->middlewareFor(['update'], ['auth:sanctum', 'abilities:posts:update'])
     ->middlewareFor(['destroy'], ['auth:sanctum', 'abilities:posts:delete']);
 
-Route::get('/v1/polls/{token}/results', [ApiPollController::class, 'results']);
-Route::get('/v1/polls/{token}', [ApiPollController::class, 'show']);
+Route::get('/v1/polls/public', [ApiPollController::class, 'publicIndex']);
+Route::get('/v1/polls/{token}/results', [ApiPollController::class, 'results'])
+    ->where('token', '[A-Za-z0-9]{32}');
+Route::get('/v1/polls/{token}', [ApiPollController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{32}');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v1/foo', [ApiFooController::class, 'show']);
