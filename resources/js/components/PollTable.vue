@@ -94,7 +94,7 @@
   <div class="poll-table-wrapper">
     <button
       type="button"
-      class="mt-6 block w-full px-4 py-2 bg-teal-600 dark:bg-purple-900 text-white rounded-md hover:bg-teal-700 dark:hover:bg-purple-800 text-center"
+      class="mt-6 mb-6 block w-full px-4 py-2 bg-teal-600 dark:bg-purple-900 text-white rounded-md hover:bg-teal-700 dark:hover:bg-purple-800 text-center"
       @click="createPoll"
     >
       Nouveau sondage
@@ -117,10 +117,11 @@
       <tbody>
         <tr v-for="poll in polls" :key="poll.id">
           <td class="border px-3 py-2">
+            <div class="flex flex-wrap gap-2">
               <button
                 v-if="poll.is_draft"
                 type="button"
-                class="btn-edit"
+                class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md bg-teal-600 dark:bg-purple-900 text-white hover:bg-teal-700 dark:hover:bg-purple-800"
                 @click="editPoll(poll.id)"
               >
                 Modifier
@@ -128,7 +129,7 @@
               <button
                 v-if="poll.is_draft"
                 type="button"
-                class="btn-publish"
+                class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700"
                 @click="publishDraft(poll)"
               >
                 Publier
@@ -136,14 +137,27 @@
               <a
                 v-if="poll.share_url"
                 :href="poll.share_url"
-                class="btn-results"
+                class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md bg-slate-600 text-white hover:bg-slate-700"
                 target="_blank"
                 rel="noopener"
               >
                 Resultats
               </a>
-              <button type="button" class="btn-delete" @click="delPoll(poll)">Supp.</button>
-              <button type="button" class="btn-copy" @click="copyShareLink(poll)">Copier lien</button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md bg-red-600 dark:bg-red-800 text-white hover:bg-red-700 dark:hover:bg-red-900"
+                @click="delPoll(poll)"
+              >
+                Supp.
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium rounded-md bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                @click="copyShareLink(poll)"
+              >
+                Copier lien
+              </button>
+            </div>
           </td>
           <td class="border px-3 py-2">{{ poll.id }}</td>
           <td class="border px-3 py-2">{{ poll.title || '-' }}</td>
@@ -164,42 +178,6 @@
 <style scoped>
   .poll-table-wrapper {
     width: 100%;
-  }
-
-  button {
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
-
-  .btn-edit {
-    background-color: #2563eb;
-  }
-
-  .btn-delete {
-    background-color: #e3342f;
-  }
-
-  .btn-publish {
-    background-color: #0f766e;
-    margin-left: 0.25rem;
-  }
-
-  .btn-results {
-    background-color: #475569;
-    margin-left: 0.25rem;
-    text-decoration: none;
-    display: inline-block;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-  }
-
-  .btn-copy {
-    background-color: #16a34a;
-    margin-left: 0.25rem;
   }
 
   .toast {
