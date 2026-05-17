@@ -1,77 +1,109 @@
-# HEIG-VD DévProdMéd Course - Mini-projet
+# WebMobUi53-fullstack
 
-Ce dépôt contient le mini-projet à réaliser dans le cadre du cours
-_"[Développement de produit média (DévProdMéd)](https://github.com/heig-vd-devprodmed-course/heig-vd-devprodmed-course)"_
-enseigné à la
-[Haute Ecole d'Ingénierie et de Gestion du Canton de Vaud (HEIG-VD)](https://heig-vd.ch),
-Suisse.
+Mini-projet HEIG-VD (DevProdMed) : réseau social + système de sondages avec backend Laravel et frontend Vue.js.
 
-## Objectif du mini-projet
+Depot GitHub : https://github.com/Keedjud/WebMobUi53-fullstack
 
-L'objectif de ce mini-projet est de créer un réseau social simple en utilisant le
-framework [Laravel](https://laravel.com/). Ce projet permettra de mettre en pratique les concepts
-appris dans le cours.
+## Description
 
-## Pré-requis
+L'application permet a une personne authentifiee de creer et gerer des sondages (question, options, parametres), puis de partager un lien public pour voter et consulter les resultats en temps reel.
+Une page publique liste les sondages actifs et un tableau de bord permet de creer, modifier, publier ou supprimer ses sondages.
 
-Afin de lancer ce projet, une stack compatible avec Laravel, est requise.
+## Fonctionnalites (criteres du TP)
 
-Voici les pré-requis nécessaires :
+- Dashboard des sondages de l'utilisateur connecte.
+- Creation, edition, suppression d'un sondage.
+- Gestion complete des options.
+- Parametres : brouillon, choix simple ou multiple, resultats publics, dates de debut/fin.
+- Publication d'un brouillon + lien de partage avec token.
+- Page de vote accessible via le lien public.
+- Vote par un utilisateur authentifie (unicite garantie pour choix unique, API + frontend).
+- Resultats publics accessibles anonymement uniquement si autorises.
+- Resultats en direct via polling + apercu graphique.
+- Etat de fin de sondage affiche clairement (vote bloque apres la date de fin).
+- Bonus : changement de vote possible si le sondage l'autorise.
 
-- PHP >= 8.0.
-- Composer.
-- Node.js et npm.
-- Une base de données (MySQL, PostgreSQL, SQLite, etc.).
-- Un serveur web (Apache, Nginx, etc.).
+## Architecture et choix techniques
 
-[Laravel Herd](https://helm.sh/docs/charts/laravel/) est recommandé pour une installation facile de Laravel et de ses dépendances.
+- Backend : Laravel 12, API JSON versionnee en /api/v1.
+- Frontend : Vue 3 + Vite + Tailwind.
+- Deux SPAs Vue :
+    - Dashboard (creation/edition/gestion).
+    - Public (liste des sondages actifs + detail/vote/resultats).
+- Authentification SPA via cookies de session Sanctum (details dans README_FRONT.md).
 
-## Développement local
+## Pre-requis
 
-Pour développer et tester le mini-projet en local, voici les étapes à suivre :
+- PHP >= 8.2
+- Composer
+- Node.js + npm
+- Base de donnees relationnelle (SQLite, MySQL, PostgreSQL)
 
-1. Forker ce dépôt
+## Installation
 
-2. Installer les dépendances avec npm et Composer :
+```bash
+composer install
+npm install
+```
 
-    ```bash
-    npm install && npm run build
+```bash
+copy .env.example .env
+php artisan key:generate
+php artisan storage:link
+```
 
-    composer install
-    ```
+Configurer la base de donnees dans `.env`, puis lancer les migrations :
 
-3. Copier le fichier `.env.example` en `.env`.
-4. Modifier les variables d'environnement si nécessaire (optionnel).
-5. Générer la clé d'application Laravel :
+```bash
+php artisan migrate
+```
 
-    ```bash
-    php artisan key:generate
-    ```
+Optionnel : remplir la base avec des donnees fictives :
 
-6. Créer le lien symbolique pour les fichiers téléversés :
+```bash
+php artisan db:seed
+```
 
-    ```bash
-    php artisan storage:link
-    ```
+## Lancement en local
 
-7. Créer la base de données et exécuter les migrations :
+```bash
+composer run dev
+```
 
-    ```bash
-    php artisan migrate
-    ```
+Ou, en deux terminaux :
 
-    S'il est nécessaire de réinitialiser la base de données, utiliser la commande `php artisan migrate:reset` puis `php artisan migrate` à nouveau.
+```bash
+php artisan serve
+npm run dev
+```
 
-8. Optionnel : en mode développement, il est possible de peupler la base de données avec des données fictives :
+L application est disponible sur http://localhost:8000.
 
-    ```bash
-    php artisan db:seed
-    ```
+## Utilisation rapide
 
-9. Démarrer le serveur de développement Laravel :
+- Se connecter / creer un compte.
+- Dashboard : http://localhost:8000/dashboard
+    - Creer un sondage, definir options + parametres.
+    - Publier directement un brouillon si besoin.
+    - Copier le lien public du sondage.
+- Page publique :
+    - Liste des sondages actifs : http://localhost:8000/polls
+    - Detail + vote : http://localhost:8000/polls/{token}
 
-    ```bash
-    composer run dev
-    ```
+## Endpoints API principaux
 
-L'application sera accessible à l'adresse <http://localhost:8000>.
+- GET /api/v1/polls (auth)
+- POST /api/v1/polls (auth)
+- PATCH /api/v1/polls/{id} (auth)
+- PATCH /api/v1/polls/{id}/publish (auth)
+- DELETE /api/v1/polls/{id} (auth)
+- GET /api/v1/polls/public
+- GET /api/v1/polls/{token}
+- GET /api/v1/polls/{token}/results
+- POST /api/v1/polls/{token}/votes (auth)
+
+
+## Notes
+
+- L integration Sanctum SPA, CSRF et la configuration des entrypoints Vite sont detaillees dans README_FRONT.md.
+- Les consignes officielles et criteres sont dans TP.md.
